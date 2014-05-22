@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<project name="Example" xmlns:ivy="antlib:org.apache.ivy.ant"
+	default="build" basedir=".">
+
+	<property name="project.module-name" value="com.example.Main" />
+
+	<property name="build.dir" value="build" />
+	<property name="gwt.cache.dir" value="${build.dir}" />
+	<property name="codeserver.dir" value="${build.dir}/codeserver" />
+
+	<property name="test.src.dir" value="test" />
+	<property name="test.build.dir" value="${build.dir}/classes/test" />
+
+	<property name="src.dir" value="src" />
+	<property name="src.build.dir" value="${build.dir}/classes/src" />
+
+	<property name="libs.dir" value="lib" />
+
+	<!-- Arguments to gwtc and devmode targets -->
+	<!-- indirectly used by build and test targets (directly by javac) -->
+	<property name="gwt.args.release" value="-logLevel WARN -workDir
+		${build.dir}/compiler/ -optimize 9 -strict" />
+
+	<!-- makes environment variables available with env. prefix -->
+	<property environment="env" />
+
+	<!-- sets class path -->
+	<path id="project.class.path">
+		<pathelement location="${src.build.dir}" />
+		<fileset dir="${libs.dir}" includes="*.jar"/>
+	</path>
+
+
+	<!--
+	Resolve target used for easier library dependency process.
+	-->
+	<target name="resolve-deps" description="Retrieve dependencies with
+		ivy.">
+		<mkdir dir="${libs.dir}" />
+		<ivy:retrieve conf="production" />
+		<ivy:retrieve conf="development" />
+	</target>
+
+
+	<target name="javac" description="Compile Java sources."
+		depends="resolve-deps" >
+		<mkdir dir="${src.build.dir}"/>
+		<javac srcdir="${src.dir}" includes="**" encoding="utf-8"
+			destdir="${src.build.dir}"
+				source="1.6" target="1.6"
+				nowarn="true"
+				debug="true"
+				debuglevel="lines,vars,source"
+				listfiles="yes"
+				includeantruntime="false">
+			<compilerarg value="-Xlint:all"/>
+			<classpath refid="project.class.path"/>
+		</javac>
+	</target>
+
+
+	<target name="gwtc" depends="javac"
+		description="GWT compiles class files to JavaScript.">
+
+		<mkdir dir="${gwt.cache.dir}" />
+		<java failonerror="true" fork="true"
+			classname="com.google.gwt.dev.Compiler">
+
+			<sysproperty key="gwt.persistentunitcachedir"
+				value="${gwt.cache.dir}" />
+
+			<classpath>
+				<pathelement location="src/" />
+				<path refid="project.class.path"/>
+			</classpath>
+
+			<jvmarg value="-Xmx256M"/>
+			<arg line="${gwt.args.release}"/>
+			<arg value="${project.module-name}"/>
+
+		</java>
+
+	</target>
+
+
+	<target name="build" depends="gwtc"
+		description="Builds this project, removes unused files from
+			war folder">
+	</target>
+
+
+	<target name="clean" description="Cleans this project">
+		<delete dir="${build.dir}" failonerror="false" />
+		<delete dir="war/Main" failonerror="false" />
+		<delete dir="war/WEB-INF" failonerror="false" />
+	</target>
+
+
+	<target name="codeserver" depends="javac"
+		description="Runs Code Server (superdevmode)">
+
+		<mkdir dir="${codeserver.dir}" />
+
+		<java failonerror="true" fork="true"
+			classname="com.google.gwt.dev.codeserver.CodeServer">
+
+			<classpath>
+				<pathelement location="src"/>
+				<path refid="project.class.path"/>
+			</classpath>
+
+			<jvmarg value="-Xmx1024M"/>
+			<arg value="-bindAddress"/>
+			<arg value="0.0.0.0"/>
+			<arg line="-port"/>
+			<arg value="9876"/>
+			<arg value="-workDir"/>
+			<arg value="${codeserver.dir}" />
+			<arg line="-src"/>
+			<arg value="${src.dir}" />
+			<arg value="${project.module-nam}" />
+		</java>
+	</target>
+
+
+	<target name="javac.test" depends="javac"
+		description="Compiles test sources.">
+
+		<mkdir dir="${test.build.dir}" />
+		<javac srcdir="${test.src.dir}"
+			includes="**"
+			encoding="utf-8"
+			destdir="${test.build.dir}"
+			source="1.6" target="1.6"
+			nowarn="true"
+			debug="true"
+			debuglevel="lines,vars,source"
+			listfiles="yes"
+			includeantruntime="false">
+
+			<classpath>
+				<path refid="project.class.path"/>
+			</classpath>
+			<compilerarg value="-Xlint:all"/>
+		</javac>
+	</target>
+
+
+	<target name="test.gwt" depends="javac.test"
+		description="Run GWTTestCase tests." >
+		<junit haltonfailure="false" includeantruntime="false">
+			<sysproperty key="gwt.args" value="-prod -runStyle
+				HtmlUnit" />
+			<sysproperty key="gwt.persistentunitcachedir"
+				value="${gwt.cache.dir}" />
+
+			<classpath>
+				<pathelement location="${src.dir}" />
+				<pathelement location="${test.build.dir}" />
+				<path refid="project.class.path" />
+			</classpath>
+			<formatter type="brief" usefile="false" />
+
+			<test name="com.example.client.TestPerson" />
+		</junit>
+	</target>
+</project>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module rename-to="Main">
+
+	<!-- Inherit the core Web Toolkit stuff.                        -->
+	<inherits name="com.google.gwt.user.User" />
+
+	<!-- Specify the app entry point class.                         -->
+	<entry-point class="com.example.client.Main" />
+
+	<!--
+	Options for super dev mode.
+	NOTE: without these, super dev mode does not find any gwt modules.
+	-->
+	<add-linker name="xsiframe"/>
+	<set-configuration-property name="devModeRedirectEnabled" value="true"/>
+
+</module>
