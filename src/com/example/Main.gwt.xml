@@ -2,6 +2,7 @@
 
 <module rename-to="Main">
 	<inherits name="com.google.gwt.json.JSON" />
+	<inherits name="com.google.gwt.user.User" />
 
 	<entry-point class="com.example.client.Main" />
 
