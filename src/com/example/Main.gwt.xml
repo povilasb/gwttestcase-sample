@@ -8,6 +8,8 @@
 	<!-- Specify the app entry point class.                         -->
 	<entry-point class="com.example.client.Main" />
 
+	<source path="client" />
+
 	<!--
 	Options for super dev mode.
 	NOTE: without these, super dev mode does not find any gwt modules.
