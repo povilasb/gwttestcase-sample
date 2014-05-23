@@ -7,7 +7,6 @@
 
 	<property name="build.dir" value="build" />
 	<property name="gwt.cache.dir" value="${build.dir}" />
-	<property name="codeserver.dir" value="${build.dir}/codeserver" />
 
 	<property name="test.src.dir" value="test" />
 	<property name="test.build.dir" value="${build.dir}/classes/test" />
@@ -94,33 +93,6 @@
 		<delete dir="${build.dir}" failonerror="false" />
 		<delete dir="war/Main" failonerror="false" />
 		<delete dir="war/WEB-INF" failonerror="false" />
-	</target>
-
-
-	<target name="codeserver" depends="javac"
-		description="Runs Code Server (superdevmode)">
-
-		<mkdir dir="${codeserver.dir}" />
-
-		<java failonerror="true" fork="true"
-			classname="com.google.gwt.dev.codeserver.CodeServer">
-
-			<classpath>
-				<pathelement location="src"/>
-				<path refid="project.class.path"/>
-			</classpath>
-
-			<jvmarg value="-Xmx1024M"/>
-			<arg value="-bindAddress"/>
-			<arg value="0.0.0.0"/>
-			<arg line="-port"/>
-			<arg value="9876"/>
-			<arg value="-workDir"/>
-			<arg value="${codeserver.dir}" />
-			<arg line="-src"/>
-			<arg value="${src.dir}" />
-			<arg value="${project.module-nam}" />
-		</java>
 	</target>
 
 
