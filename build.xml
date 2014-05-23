@@ -149,13 +149,15 @@
 
 	<target name="test.gwt" depends="javac.test"
 		description="Run GWTTestCase tests." >
-		<junit haltonfailure="false" includeantruntime="false">
+		<junit haltonfailure="false" includeantruntime="false"
+			fork="true" forkmode="once" >
 			<sysproperty key="gwt.args" value="-prod -runStyle
 				HtmlUnit" />
 			<sysproperty key="gwt.persistentunitcachedir"
 				value="${gwt.cache.dir}" />
 
 			<classpath>
+				<pathelement location="${test.src.dir}" />
 				<pathelement location="${src.dir}" />
 				<pathelement location="${test.build.dir}" />
 				<path refid="project.class.path" />
